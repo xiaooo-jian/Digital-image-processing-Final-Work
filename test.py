@@ -15,17 +15,22 @@ gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
 kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (20, 20))  # 定义结构元素
 closing = cv2.morphologyEx(gray, cv2.MORPH_CLOSE, kernel)  # 闭运算
-kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (20, 20))  # 定义结构元素
+kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (45, 45))  # 定义结构元素
 closing = cv2.morphologyEx(closing, cv2.MORPH_OPEN, kernel)  # 闭运算
 
-
-res = cv2.GaussianBlur(closing, (5, 5), 5)
 labeled = cv2.imread("test3.png")
-labeled = cv2.resize(labeled, (1280, 720), interpolation=cv2.INTER_CUBIC)
-cnts, hierarchy = cv2.findContours(res, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-image = cv2.drawContours(labeled, cnts, -1, (0, 0, 255), 3)
+image = cv2.resize(labeled, (1280, 720), interpolation=cv2.INTER_CUBIC)
+cnts, hierarchy = cv2.findContours(closing, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
+for i in range(0, len(cnts)):
+    x, y, w, h = cv2.boundingRect(cnts[i])
+    cv2.rectangle(image, (x, y), (x + w, y + h), (153, 153, 0), 5)
+    newimage = image[y + 2:y + h - 2, x + 2:x + w - 2]  # 先用y确定高，再用x确定宽
+    if newimage.shape[0] < 50 or newimage.shape[1] < 50:
+        continue
+    cv2.imshow("1", newimage)
+    cv2.waitKey()
+
+image = cv2.drawContours(image, cnts, -1, (0, 0, 255), 3)
 cv2.imshow("1", image)
-
-"""cv2.imshow("1", th1[535:600, 270:935])"""
 cv2.waitKey()

@@ -1,8 +1,26 @@
+import pytesseract as tess
 import numpy as np
 import cv2
 
 lower_white = np.array([0, 0, 221])
 upper_white = np.array([180, 30, 255])
+
+
+def recognize_text(img):
+    img = img[0:int(img.shape[0] / 3.45), :]
+
+    w = img.shape[0] * 2
+    h = img.shape[1] * 2
+    img = cv2.resize(img, (int(h), int(w)))
+    ret, binnary = cv2.threshold(img, 150, 255, cv2.THRESH_OTSU)
+
+    kerhel = cv2.getStructuringElement(cv2.MORPH_CROSS, (5, 1))
+    bin2 = cv2.morphologyEx(binnary, cv2.MORPH_CLOSE, kerhel, iterations=1)
+
+    text = tess.image_to_string(bin2)
+    cv2.imshow("binary_img", bin2)
+    cv2.waitKey()
+    return text.replace(' ', '')
 
 
 def CardPartition(img):
@@ -23,7 +41,9 @@ def CardPartition(img):
     for i in range(0, len(cnts)):
         x, y, w, h = cv2.boundingRect(cnts[i])
         cv2.rectangle(img, (x, y), (x + w, y + h), (153, 153, 0), 5)
-        newimage = img[y + 2:y + h - 2, x + 2:x + w - 2]  # 先用y确定高，再用x确定宽
+        newimage = gray[y + 2:y + h - 2, x + 2:x + w - 2]  # 先用y确定高，再用x确定宽
+        '''cv2.imshow("1", newimage)
+        cv2.waitKey()'''
         res.append(newimage)
     return res
 
@@ -35,13 +55,20 @@ def getHandCard(img):
 
 def getMasterCard(img):
     masterCard = img[0:150, 500:800]
-    cv2.imshow("1", CardPartition(masterCard)[0])
+    card = CardPartition(masterCard)
+    '''print(len(card))'''
+    if len(card) == 0:
+        return False
+    return True
 
 
 def getOutCard(img):
     outCard = img[250:430, 300:980]  # 划分手牌、地主牌、出牌区域，方便进行识别
-    cv2.imshow("1", CardPartition(outCard)[0])
+    return CardPartition(outCard)
 
 
 img = cv2.imread("test3.png")
 img = cv2.resize(img, (1280, 720), interpolation=cv2.INTER_CUBIC)
+res = getOutCard(img)
+for image in res:
+    print(recognize_text(image))

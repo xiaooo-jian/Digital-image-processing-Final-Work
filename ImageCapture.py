@@ -21,10 +21,10 @@ def screenShot():
     memdc.SelectObject(bmp)
     memdc.BitBlt((0, 0), (width, height), srcdc, (left, top), win32con.SRCCOPY)
 
-    signedIntsArray = bmp.GetBitmapBits(True)
+    signedIntsArray = bmp.GetBitmapBits(True)  #转为opencv的格式
     img = np.frombuffer(signedIntsArray, dtype='uint8')
     img.shape = (height, width, 4)
-    return img
+    return cv2.resize(img, (1280, 720), interpolation=cv2.INTER_CUBIC)
 
 
 ''' srcdc.DeleteDC()

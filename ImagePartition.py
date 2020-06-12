@@ -6,23 +6,6 @@ lower_white = np.array([0, 0, 221])
 upper_white = np.array([180, 30, 255])
 
 
-def recognize_text(img):
-    img = img[0:int(img.shape[0] / 3.45), :]
-
-    w = img.shape[0] * 2
-    h = img.shape[1] * 2
-    img = cv2.resize(img, (int(h), int(w)))
-    ret, binnary = cv2.threshold(img, 150, 255, cv2.THRESH_OTSU)
-
-    kerhel = cv2.getStructuringElement(cv2.MORPH_CROSS, (5, 1))
-    bin2 = cv2.morphologyEx(binnary, cv2.MORPH_CLOSE, kerhel, iterations=1)
-
-    text = tess.image_to_string(bin2)
-    cv2.imshow("binary_img", bin2)
-    cv2.waitKey()
-    return text.replace(' ', '')
-
-
 def CardPartition(img):
     HSV_img = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
     mask = cv2.inRange(HSV_img, lower_white, upper_white)
@@ -70,5 +53,5 @@ def getOutCard(img):
 img = cv2.imread("test3.png")
 img = cv2.resize(img, (1280, 720), interpolation=cv2.INTER_CUBIC)
 res = getOutCard(img)
-for image in res:
-    print(recognize_text(image))
+
+

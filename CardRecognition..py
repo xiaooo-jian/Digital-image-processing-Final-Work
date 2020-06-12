@@ -10,9 +10,10 @@ def recognize_text(img):
     bin2 = cv2.morphologyEx(binnary, cv2.MORPH_CLOSE, kerhel2, iterations=1)
 
     text = tess.image_to_string(bin2)
+
+    print(text.replace(' ', ''))
     cv2.imshow("binary_img", bin2)
     cv2.waitKey()
-    print(text.replace(' ', ''))
     return text.replace(' ', '')
 
 

@@ -9,6 +9,7 @@ import cv2
 import json
 import jsonpath
 
+
 def text_recognition(image):
     image = cv2.imencode('.jpg', image)[1]
 
@@ -37,4 +38,3 @@ def get_text(image_code):
         return resp.to_json_string()
     except TencentCloudSDKException as err:
         print(err)
-

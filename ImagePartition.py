@@ -33,7 +33,13 @@ def CardPartition(img):
 
 def getHandCard(img):
     handCard = img[500:700, :]
-    cv2.imshow("1", CardPartition(handCard)[0])
+    card = CardPartition(handCard)[0]
+    res_card = card[0:int(card.shape[0] / 3.4), :]
+    kerhel2 = cv2.getStructuringElement(cv2.MORPH_RECT, (4, 1))
+    res_card = cv2.morphologyEx(res_card, cv2.MORPH_CLOSE, kerhel2, iterations=1)
+    '''cv2.imshow("1",res_card)
+    cv2.waitKey()'''
+    return res_card
 
 
 def getMasterCard(img):
@@ -47,11 +53,15 @@ def getMasterCard(img):
 
 def getOutCard(img):
     outCard = img[250:430, 300:980]  # 划分手牌、地主牌、出牌区域，方便进行识别
-    return CardPartition(outCard)
-
-
-img = cv2.imread("test3.png")
-img = cv2.resize(img, (1280, 720), interpolation=cv2.INTER_CUBIC)
-res = getOutCard(img)
+    cards = CardPartition(outCard)
+    res_cards = []
+    for card in cards:
+        res_card = card[0:int(card.shape[0] / 3.5), :]
+        kerhel2 = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 1))
+        res_card = cv2.morphologyEx(res_card, cv2.MORPH_CLOSE, kerhel2, iterations=1)
+        '''cv2.imshow("1", res_card)
+        cv2.waitKey()'''
+        res_cards.append(res_card)
+    return res_cards
 
 

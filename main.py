@@ -1,9 +1,9 @@
 import sys
-import time
 
-from PyQt5.QtCore import QObject, pyqtSignal, QThread, QTimer
+import PyWinMouse as mouse
+from PyQt5.QtCore import Qt, QCoreApplication, QTimer
 from PyQt5.QtWidgets import (QWidget, QPushButton,
-                             QHBoxLayout, QVBoxLayout, QApplication, QDesktopWidget, QLabel, QLineEdit, QFormLayout)
+                             QHBoxLayout, QVBoxLayout, QApplication, QDesktopWidget, QLabel)
 from qtpy import QtCore
 import MainFunction as mf
 
@@ -20,14 +20,19 @@ class Window(QWidget):
 
         start = QPushButton("开始")
         screen = QPushButton("截取")
+        quits = QPushButton("退出")
 
         start.clicked.connect(self.start)
         screen.clicked.connect(self.screenshot)
+        quits.clicked.connect(QCoreApplication.instance().quit)
 
         button_box = QHBoxLayout()
         button_box.addStretch(1)
+
         button_box.addWidget(start)
         button_box.addWidget(screen)
+        button_box.addWidget(quits)
+
         self.vbox = QVBoxLayout()
         card = QLabel("牌型： 王 | 2 | A | K | Q | J | 10 | 9 | 8 | 7 | 6 | 5 | 4 | 3 ")
         self.number = QLabel(self.getcard())
@@ -35,6 +40,7 @@ class Window(QWidget):
         self.vbox.addWidget(card)
         self.vbox.addWidget(self.number)
 
+        self.setWindowFlag(Qt.FramelessWindowHint)
         self.vbox.addLayout(button_box)
         self.setLayout(self.vbox)
         self.resize(570, 100)
@@ -47,18 +53,6 @@ class Window(QWidget):
         # 显示到屏幕中心
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-
-    '''def initUI(self):
-        pass
-        #创建线程
-        self.backend = BackendThread()
-        # 连接信号
-        self.backend.update_date.connect(self.handleDisplay)
-        self.thread = QThread()
-        self.backend.moveToThread(self.thread)
-        # 开始线程
-        self.thread.started.connect(self.backend.run)
-        self.thread.start()'''
 
     def handleDisplay(self):
         self.number.setText(self.getcard())
@@ -81,16 +75,21 @@ class Window(QWidget):
             self.card["4"], self.card["3"])
 
 
-'''class BackendThread(QObject):
-    # 通过类成员对象定义信号
-    update_date = pyqtSignal(str)
-    timer = QTimer()
+    # 因为边框去掉了，为了能拖动，只能重写一下鼠标事件了
+    def mousePressEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            self.m_drag = True
+            self.m_DragPosition = e.globalPos() - self.pos()
+            e.accept()
 
-    # 处理业务逻辑
-    def run(self):
-        while True:
-            self.update_date.emit()
-            time.sleep(1000)'''
+    def mouseReleaseEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            self.m_drag = False
+
+    def mouseMoveEvent(self, e):
+        if Qt.LeftButton and self.m_drag:
+            self.move(e.globalPos() - self.m_DragPosition)
+            e.accept()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

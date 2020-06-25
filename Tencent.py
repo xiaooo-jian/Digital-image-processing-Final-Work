@@ -22,7 +22,7 @@ def text_recognition(image):
 
 def get_text(image_code):
     try:
-        cred = credential.Credential("AKIDVmoHVSqfttfBRXRajeIq8Axf15udmSYP", "ymLfjY7TZkjY9XgdHg6MM9gyY3Qnzvyl")
+        cred = credential.Credential("XXXXX", "XXXXX")
         httpProfile = HttpProfile()
         httpProfile.endpoint = "ocr.tencentcloudapi.com"
 
